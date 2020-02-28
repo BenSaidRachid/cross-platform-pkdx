@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { StyleSheet, View, Switch, Text, TouchableOpacity, Image, FlatList, ActivityIndicator, SafeAreaView } from 'react-native';
+import { Text} from 'react-native';
 import api from './../../services/api';
 import utils from './../../helpers/utils';
 

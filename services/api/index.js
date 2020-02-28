@@ -1,4 +1,5 @@
 import pokemons from './pokemons';
 import auth from './auth';
+import trainers from './trainers';
 
-export default {pokemons, auth};
+export default {pokemons, trainers, auth};

@@ -1,5 +1,5 @@
 const TRAINERS = "/trainers/";
-const trainerFavorite = (uid, id) => `/trainers/${uid}/pokemons/${id}/`;
+const trainerFavorite = (uid, id) => `/trainers/${uid}/${id}/pokemon/`;
 
 export {
     TRAINERS,

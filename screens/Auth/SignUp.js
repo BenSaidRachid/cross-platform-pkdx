@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, TextInput, SafeAreaView } from 'react-native';
 import auth from '../../helpers/firebase_auth';
 
@@ -8,11 +8,12 @@ export default function SignUp({navigation}) {
     const signUp = () => {
       const {email, password} = state;
       if(email.length > 0 && password.length > 0) {
-          auth.signUp(email, password).then(({user}) => {
-              alert("New user created")
-          })
+          auth.signUp(email, password).then(() => {
+                alert("New user created");
+                setTimeout(() => { navigation.goBack() }, 1500);
+          });
       } else {
-          alert("Can't sign up")
+          alert("Error can't sign up");
       }
       
   }
@@ -31,8 +32,8 @@ export default function SignUp({navigation}) {
               value={state.password}
               placeholder="Password"
             />
-          <TouchableOpacity style={{backgroundColor: '#007BFE', padding: 10, alignItems: "center", borderRadius: 25}} onPress={() => signUp()}>
-              <Text style={{color: 'white'}}>Login</Text>
+          <TouchableOpacity style={{backgroundColor: '#007BFE', padding: 15, alignItems: "center", borderRadius: 10}} onPress={() => signUp()}>
+              <Text style={{color: 'white'}}>Sign up</Text>
           </TouchableOpacity>
         </View>
         <TouchableOpacity style={{alignItems: "center"}} onPress={() => navigation.goBack()}>
@@ -50,9 +51,8 @@ const styles = StyleSheet.create({
   input: {
       backgroundColor: '#EEEEEE',
       alignContent: 'center',
-      borderRadius: 12,
+      borderRadius: 10,
       marginBottom: 20,
-      paddingHorizontal: 10,
-      paddingVertical: 5
+      padding: 15
   }
 });
