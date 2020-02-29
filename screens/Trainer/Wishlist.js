@@ -23,9 +23,9 @@ export default function Wishlist({navigation}) {
         if(wishlist) {
             let pokemons = [];
             for (const id in wishlist) {
-                const {pokemon} = wishlist[id];
+                const {pokemonID} = wishlist[id];
 
-                pokemons.push({url: `https://pokeapi.co/api/v2/pokemon/${pokemon.id}`})
+                pokemons.push({url: `https://pokeapi.co/api/v2/pokemon/${pokemonID}`})
             }
             setState({...state, wishlist: pokemons});
         }
@@ -56,7 +56,7 @@ export default function Wishlist({navigation}) {
             state.isAuth ? state.wishlist.length > 0 ? <View style={{flex:1, marginHorizontal: 25, marginTop: 20}}>
                 <FlatList
                     data={state.wishlist}
-                    renderItem={({ item }) => <ListItems {...item} navigation={navigation}/>}
+                    renderItem={({ item }) => <ListItems {...item} navigation={navigation} keyExtractor={(item, index) => 'key_' + index}/>}
                     keyExtractor={(item, index) => 'key_' + index}
                 />
             </View> : 

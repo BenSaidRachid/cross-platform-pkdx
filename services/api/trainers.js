@@ -6,7 +6,7 @@ const trainers = {
         const pokemonId = pokemonReference.push().key;
         let referencePath = trainerFavorite(uid, pokemonId);
         
-        pokemonReference.child(referencePath).set({id});
+        pokemonReference.child(referencePath).set({pokemonID: id});
     },
     getAll: ({uid}) => {
         const trainerReference =  firebase.database().ref(TRAINERS + uid);
@@ -22,14 +22,14 @@ const trainers = {
         const trainerReference =  firebase.database().ref(TRAINERS + uid);
     
         const getPokemons = new Promise((resolve, reject) => {
-            trainerReference
-            .on("value", snapshot => {
-                resolve(snapshot.val());
-            })
+            trainerReference.orderByChild('pokemonID')
+                .equalTo(id)
+                .on("value", snapshot => {
+                    resolve(snapshot.val());
+                })
         });
 
-        
-        return getPokemons.then(pokemons => console.log(pokemons));
+        return getPokemons.then(pokemons => pokemons);
     }
 };
   

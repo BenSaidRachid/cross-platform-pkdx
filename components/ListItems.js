@@ -1,67 +1,73 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, Component} from 'react';
 import { StyleSheet, View, Switch, Text, TouchableOpacity, Image } from 'react-native';
 import api from './../services/api';
 import storage from './../helpers/storage';
+import utils from './../helpers/utils';
 import constants from './../data/constants';
 import empty_heart from './../assets/empty_heart.png';
 import heart from './../assets/heart.png';
 
-export default Item = (data) => {
-    const [pokemon, setPokemon] = useState({pokemon: null, shiny: null, imageUrl: null, isFavorite: false})
-    useEffect(() => {
-        getPokemon(data.url);
-    }, [])
-
-    useEffect(() => {
-        if(pokemon.shiny !== null) {
-            if(pokemon.shiny) {
-                setPokemon({...pokemon, imageUrl: pokemon.sprites.front_shiny})
-            } else {
-                setPokemon({...pokemon, imageUrl: pokemon.sprites.front_default})
-            }
+export default class ListItem extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            id: -1,
+            name: null,
+            sprites: [],
+            types: [],
+            imageUrl: null,
+            isShiny: false,
+            imageUrl: null,
+            isFavorite: false
         }
-    }, [pokemon.shiny])
-
-    useEffect(() => {
-        if(pokemon) {
-            getFavorite();
-        }
-    }, [pokemon])
-
-    const formatNdex = index => {
-        if(index < 10) {
-            return `00${index}`;
-        } else if(index < 100) {
-            return `0${index}`;
-        }
-        return index
     }
 
-    const getPokemon = async (url) => {
+    componentDidUpdate() {
+        this._getPokemon(this.props.url);
+    }
+   
+    _handleIsShinyToggle = value => {
+        
+        const imageUrl = value ? this.state.sprites.front_shiny : this.state.sprites.front_default;
+        this.setState({
+            ...this.state,
+            isShiny: value,
+            imageUrl
+        })
+    }
+    _getPokemon = async (url) => {
         try {
             const {data} = await api.pokemons.getOne(url);
-            setPokemon({
+            this.setState({
+                ...this.state,
                 id: data.id,
                 name: data.name,
                 sprites: data.sprites,
                 types: data.types.map(data => data.type.name),
                 imageUrl: data.sprites.front_default,
-                shiny: false
+                isShiny: this.state.isShiny,
+                isFavorite: this.state.isFavorite
+            }, () => {
+                this._getFavorite()
             });
         } catch(error) {}
     }
 
-    const getFavorite = async () => {
+    _getFavorite = async () => {
         try {
             const userData = await storage.get(constants.USER);
             const {value} = userData;
             const {user} = value;
-            await api.trainers.getOne({uid: user.uid, id: pokemon.id});
+            const isFavorite = await api.trainers.getOne({uid: user.uid, id: this.state.id});
+            this.setState({
+                ...this.state,
+                isFavorite: isFavorite ? true : false
+            });
 
         } catch(error) {}
     }
 
-    const setFavorite = async () => {
+    _setFavorite = async () => {
         try {
             const isAuth = await api.auth.isAuth();
            
@@ -75,34 +81,33 @@ export default Item = (data) => {
                 const userData = await storage.get(constants.USER);
                 const {value} = userData;
                 const {user} = value;
-                await api.trainers.addPokemon({uid: user.uid, id: pokemon.id});
-
-                setPokemon({
-                    ...pokemon,
-                     isFavorite: !pokemon.isFavorite
+                await api.trainers.addPokemon({uid: user.uid, id: this.state.id});
+                this.setState({
+                    ...this.state,
+                     isFavorite: !this.state.isFavorite
                 });
              } catch(error) {}
             }
         } catch(error) {}
     }
     
-    return (
-      <TouchableOpacity 
-        style={{alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#EEEEEE'}}
-        onPress={() => data.navigation.navigate('Detail', {id: (pokemon || {}).id})}>
-        {
-            pokemon && <View style={styles.item}>
-            <Text style={styles.index}>#{formatNdex(pokemon.id)}</Text>
-            <Image style={{marginHorizontal:5, width: 100, height: 100}} source={{uri: pokemon.imageUrl || ""}} />
-            <Text style={styles.name}>{pokemon.name}</Text>
-            <Switch style={{  marginEnd: 15, transform: [{ scaleX: .8 }, { scaleY: .8 }]}} value={pokemon.shiny} onValueChange={value => setPokemon({...pokemon, shiny: value})}/>
-            <TouchableOpacity onPress={() => setFavorite()}>
-                <Image style={{ width: 30, height: 30}} source={pokemon.isFavorite ? heart : empty_heart} />
+    render() {
+        return (
+            <TouchableOpacity style={{alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#EEEEEE'}} onPress={() => this.props.navigation.navigate('Detail', {id: (this.state || {}).id})}>
+              {
+                  this.state.id > 0 && <View style={styles.item}>
+                  <Text style={styles.index}>#{utils.formatNdex(this.state.id)}</Text>
+                  <Image style={{marginHorizontal:5, width: 100, height: 100}} source={{uri: this.state.imageUrl || ""}} />
+                  <Text style={styles.name}>{this.state.name}</Text>
+                  <Switch style={{ marginEnd: 15, transform: [{ scaleX: .8 }, { scaleY: .8 }]}} value={this.state.isShiny} onValueChange ={value => console.log('onValueChange', value)}/>
+                  <TouchableOpacity onPress={() => this._setFavorite()}>
+                      <Image style={{ width: 30, height: 30}} source={this.state.isFavorite ? heart : empty_heart} />
+                  </TouchableOpacity>
+              </View>
+              }
             </TouchableOpacity>
-        </View>
-        }
-      </TouchableOpacity>
-    );
+          );
+    }
 }
 
 const styles = StyleSheet.create({

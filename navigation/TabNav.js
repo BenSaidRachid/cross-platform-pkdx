@@ -26,31 +26,33 @@ const WishlistNavigator = () => <Stack.Navigator initialRouteName="Pokédex">
     }}/>
 </Stack.Navigator>
 
-export default TabNav = () => <Tab.Navigator initialRouteName="Pokédex">
-    <Tab.Screen 
-        name="Pokédex"
-        component={Home}
-        options={{
-            tabBarLabel: "Pokédex",
-            tabBarIcon: ({ tintColor }) => (
-              <Image
-                source={PokedexIcon}
-                style={{ width: 26, height: 26, tintColor: tintColor }}
-              />
-            )
-        }}
-        
-        />
-    <Tab.Screen
-        name="Wishlist" 
-        component={WishlistNavigator}
-        options={{
-            tabBarLabel: "Wishlist",
-            tabBarIcon: ({ tintColor }) => (
-              <Image
-                source={WishlistIcon}
-                style={{ width: 26, height: 26, tintColor: tintColor }}
-              />
-            ),
-        }} />
-</Tab.Navigator>
+export default function TabNav() {
+  return <Tab.Navigator initialRouteName="Pokédex">
+      <Tab.Screen 
+          name="Pokédex"
+          component={Home}
+          options={{
+              tabBarLabel: "Pokédex",
+              tabBarIcon: ({ tintColor }) => (
+                <Image
+                  source={PokedexIcon}
+                  style={{ width: 26, height: 26, tintColor: tintColor }}
+                />
+              )
+          }}
+          
+          />
+      <Tab.Screen
+          name="Wishlist" 
+          component={WishlistNavigator}
+          options={{
+              tabBarLabel: "Wishlist",
+              tabBarIcon: ({ tintColor }) => (
+                <Image
+                  source={WishlistIcon}
+                  style={{ width: 26, height: 26, tintColor: tintColor }}
+                />
+              ),
+          }} />
+  </Tab.Navigator>
+}

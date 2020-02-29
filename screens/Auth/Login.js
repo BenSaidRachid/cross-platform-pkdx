@@ -6,7 +6,6 @@ import storage from "./../../helpers/storage";
 
 export default function Login({route, navigation}) {
     const [state, setState] = useState({email: '', password: ''})
-
     
     const login = () => {
         const {email, password} = state;
