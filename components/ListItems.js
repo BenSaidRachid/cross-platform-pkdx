@@ -15,7 +15,6 @@ export default class ListItem extends Component {
             name: null,
             sprites: [],
             types: [],
-            imageUrl: null,
             isShiny: false,
             imageUrl: null,
             isFavorite: false
@@ -27,8 +26,9 @@ export default class ListItem extends Component {
     }
    
     _handleIsShinyToggle = value => {
-        
         const imageUrl = value ? this.state.sprites.front_shiny : this.state.sprites.front_default;
+        console.log(value)
+        console.log(imageUrl)
         this.setState({
             ...this.state,
             isShiny: value,
@@ -44,7 +44,7 @@ export default class ListItem extends Component {
                 name: data.name,
                 sprites: data.sprites,
                 types: data.types.map(data => data.type.name),
-                imageUrl: data.sprites.front_default,
+                imageUrl: this.state.imageUrl || data.sprites.front_default,
                 isShiny: this.state.isShiny,
                 isFavorite: this.state.isFavorite
             }, () => {
