@@ -99,7 +99,7 @@ export default class ListItem extends Component {
                   <Text style={styles.index}>#{utils.formatNdex(this.state.id)}</Text>
                   <Image style={{marginHorizontal:5, width: 100, height: 100}} source={{uri: this.state.imageUrl || ""}} />
                   <Text style={styles.name}>{this.state.name}</Text>
-                  <Switch style={{ marginEnd: 15, transform: [{ scaleX: .8 }, { scaleY: .8 }]}} value={this.state.isShiny} onValueChange ={value => console.log('onValueChange', value)}/>
+                  <Switch style={{ marginEnd: 15, transform: [{ scaleX: .8 }, { scaleY: .8 }]}} value={this.state.isShiny}  onValueChange = {this._handleIsShinyToggle}/>
                   <TouchableOpacity onPress={() => this._setFavorite()}>
                       <Image style={{ width: 30, height: 30}} source={this.state.isFavorite ? heart : empty_heart} />
                   </TouchableOpacity>

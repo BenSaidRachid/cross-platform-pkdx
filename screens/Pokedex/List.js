@@ -33,7 +33,6 @@ export default class List extends Component {
             this.setState({...this.state, loading: true });
             const {data} = getFirst ? await api.pokemons.getAll() : await api.pokemons.getNext(this.state.nextUrl);
             const {next, results} = data;
-            console.log(next)
             this.setState({
                 ...this.state,
                 pokemons: [...this.state.pokemons, ...results],
