@@ -1,4 +1,4 @@
-import React, {useState, useEffect, Component} from 'react';
+import React, {Component} from 'react';
 import { StyleSheet, View, Switch, Text, TouchableOpacity, Image } from 'react-native';
 import api from './../services/api';
 import storage from './../helpers/storage';
@@ -11,60 +11,42 @@ export default class ListItem extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            id: -1,
-            name: null,
-            sprites: [],
-            types: [],
+            id: this.props.id,
+            name: this.props.name,
+            sprites: this.props.sprites,
+            types: this.props.types.map(data => data),
+            imageUrl: this.props.sprites.front_default,
             isShiny: false,
-            imageUrl: null,
             isFavorite: false
         }
     }
 
     componentDidUpdate() {
-        this._getPokemon(this.props.url);
+        this._getFavorite();
     }
    
     _handleIsShinyToggle = value => {
         const imageUrl = value ? this.state.sprites.front_shiny : this.state.sprites.front_default;
-        console.log(value)
-        console.log(imageUrl)
         this.setState({
             ...this.state,
             isShiny: value,
             imageUrl
         })
     }
-    _getPokemon = async (url) => {
-        try {
-            const {data} = await api.pokemons.getOne(url);
-            this.setState({
-                ...this.state,
-                id: data.id,
-                name: data.name,
-                sprites: data.sprites,
-                types: data.types.map(data => data.type.name),
-                imageUrl: this.state.imageUrl || data.sprites.front_default,
-                isShiny: this.state.isShiny,
-                isFavorite: this.state.isFavorite
-            }, () => {
-                this._getFavorite()
-            });
-        } catch(error) {}
-    }
 
     _getFavorite = async () => {
         try {
             const userData = await storage.get(constants.USER);
-            const {value} = userData;
-            const {user} = value;
-            const isFavorite = await api.trainers.getOne({uid: user.uid, id: this.state.id});
-            this.setState({
-                ...this.state,
-                isFavorite: isFavorite ? true : false
-            });
-
-        } catch(error) {}
+            if(userData) {
+                const {value} = userData;
+                const {user} = value;
+                const isFavorite = await api.trainers.getOne({uid: user.uid, id: this.state.id});
+                this.setState({
+                    ...this.state,
+                    isFavorite: isFavorite ? true : false
+                });
+            }
+8        } catch(error) {}
     }
 
     _setFavorite = async () => {
@@ -81,7 +63,7 @@ export default class ListItem extends Component {
                 const userData = await storage.get(constants.USER);
                 const {value} = userData;
                 const {user} = value;
-                await api.trainers.addPokemon({uid: user.uid, id: this.state.id});
+                await api.trainers.addPokemon({uid: user.uid, ...this.state});
                 this.setState({
                     ...this.state,
                      isFavorite: !this.state.isFavorite
@@ -95,7 +77,7 @@ export default class ListItem extends Component {
         return (
             <TouchableOpacity style={{alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#EEEEEE'}} onPress={() => this.props.navigation.navigate('Detail', {id: (this.state || {}).id})}>
               {
-                  this.state.id > 0 && <View style={styles.item}>
+                <View style={styles.item}>
                   <Text style={styles.index}>#{utils.formatNdex(this.state.id)}</Text>
                   <Image style={{marginHorizontal:5, width: 100, height: 100}} source={{uri: this.state.imageUrl || ""}} />
                   <Text style={styles.name}>{this.state.name}</Text>
@@ -103,7 +85,7 @@ export default class ListItem extends Component {
                   <TouchableOpacity onPress={() => this._setFavorite()}>
                       <Image style={{ width: 30, height: 30}} source={this.state.isFavorite ? heart : empty_heart} />
                   </TouchableOpacity>
-              </View>
+                </View>
               }
             </TouchableOpacity>
           );

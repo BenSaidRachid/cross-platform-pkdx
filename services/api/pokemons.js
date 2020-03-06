@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const pokemons = {
-    getAll: () => {
+    getFirst: () => {
       return axios.get("https://pokeapi.co/api/v2/pokemon/")
     },
     getNext: url => {

@@ -1,12 +1,13 @@
 import firebase from "firebase";
 import {TRAINERS, trainerFavorite} from "./../../helpers/firebase_ref";
 const trainers = {
-    addPokemon: ({uid, id, favorite}) => {
+    addPokemon: ({uid, id, name, sprites, types, imageUrl}) => {
+
         const pokemonReference = firebase.database().ref();
         const pokemonId = pokemonReference.push().key;
         let referencePath = trainerFavorite(uid, pokemonId);
         
-        pokemonReference.child(referencePath).set({pokemonID: id});
+        pokemonReference.child(referencePath).set({id, name, sprites, types, imageUrl});
     },
     getAll: ({uid}) => {
         const trainerReference =  firebase.database().ref(TRAINERS + uid);
@@ -22,7 +23,7 @@ const trainers = {
         const trainerReference =  firebase.database().ref(TRAINERS + uid);
     
         const getPokemons = new Promise((resolve, reject) => {
-            trainerReference.orderByChild('pokemonID')
+            trainerReference.orderByChild('id')
                 .equalTo(id)
                 .on("value", snapshot => {
                     resolve(snapshot.val());

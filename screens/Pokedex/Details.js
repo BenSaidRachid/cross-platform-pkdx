@@ -2,12 +2,15 @@ import React, {useState, useEffect} from 'react';
 import { Image, View, Text, StyleSheet} from 'react-native';
 import api from './../../services/api';
 import utils from './../../helpers/utils';
+import storage from './../../helpers/storage';
+import constants from './../../data/constants';
 import { ScrollView } from 'react-native-gesture-handler';
 
 export default function Details({route, navigation}) {
     const [pokemon, setPokemon] = useState(null)
     useEffect(() => {
         getPokemon();
+        _getFavorite();
     }, [])
 
     useEffect(() => {
@@ -15,6 +18,45 @@ export default function Details({route, navigation}) {
             navigation.setOptions({title: utils.capitalize(pokemon.name)})
        }
     }, [pokemon])
+
+    const _getFavorite = async () => {
+        try {
+            const userData = await storage.get(constants.USER);
+            if(userData) {
+                const {value} = userData;
+                const {user} = value;
+                const isFavorite = await api.trainers.getOne({uid: user.uid, id: pokemon.id});
+                setPokemon({
+                    ...pokemon,
+                    isFavorite: isFavorite ? true : false
+                });
+            }
+8        } catch(error) {}
+    }
+
+    const _setFavorite = async () => {
+        try {
+            const isAuth = await api.auth.isAuth();
+           
+            if(!isAuth)
+                navigation.navigate('Auth', {
+                    screen: 'Login',
+                    params: { onGoBack : () => setFavorite() },
+                });
+            else {
+             try {
+                const userData = await storage.get(constants.USER);
+                const {value} = userData;
+                const {user} = value;
+                await api.trainers.addPokemon({uid: user.uid, ...pokemon});
+                setPokemon({
+                    ...pokemon,
+                     isFavorite: !pokemon.isFavorite
+                });
+             } catch(error) {}
+            }
+        } catch(error) {}
+    }
 
     const getPokemon = async () => {
         const {params} = route;

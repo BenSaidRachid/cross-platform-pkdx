@@ -22,10 +22,10 @@ export default function Wishlist({navigation}) {
         const wishlist = await api.trainers.getAll({uid});
         if(wishlist) {
             let pokemons = [];
-            for (const id in wishlist) {
-                const {pokemonID} = wishlist[id];
+            for (const wishlistId in wishlist) {
+                const {id, name, sprites, types, imageUrl} = wishlist[wishlistId];
 
-                pokemons.push({url: `https://pokeapi.co/api/v2/pokemon/${pokemonID}`})
+                pokemons.push({id, name, sprites, types, imageUrl})
             }
             setState({...state, wishlist: pokemons});
         }
